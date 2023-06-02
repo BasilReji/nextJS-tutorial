@@ -1,27 +1,13 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-export default function Home() {
-  const router = useRouter();
+import EventList from "@/components/events/event-list";
+import { getFeaturedEvents } from "@/dummy/dummy-data";
 
-  const handleClick = () => {
-    router.push("/product");
-  };
+function HomePage() {
+  let featuredEvents = getFeaturedEvents();
   return (
-    <div className="main-container">
-      <h1>Home Page</h1>
-      <Link href={"/blog"}>Blog </Link>
-      <Link href={"/docs/1"}>Docs </Link>
-      <button onClick={handleClick}>Place Order</button>
-      <Link
-        href={{
-          pathname: "docs/[id]",
-          query: {
-            id: 1,
-          },
-        }}
-      >
-        Docs
-      </Link>
+    <div>
+      <EventList items={featuredEvents} />
     </div>
   );
 }
+
+export default HomePage;
