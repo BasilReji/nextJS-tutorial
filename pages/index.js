@@ -1,27 +1,44 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-export default function Home() {
-  const router = useRouter();
+import fs from "fs";
+import path from "path";
 
-  const handleClick = () => {
-    router.push("/product");
-  };
+function HomePage(props) {
+  let { products } = props;
   return (
-    <div className="main-container">
-      <h1>Home Page</h1>
-      <Link href={"/blog"}>Blog </Link>
-      <Link href={"/docs/1"}>Docs </Link>
-      <button onClick={handleClick}>Place Order</button>
-      <Link
-        href={{
-          pathname: "docs/[id]",
-          query: {
-            id: 1,
-          },
-        }}
-      >
-        Docs
-      </Link>
-    </div>
+    <ul className="main-container">
+      {products.map((item) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
+    </ul>
   );
 }
+
+/* 
+process.cwd root directory mot pages
+*/
+
+export async function getStaticProps(context) {
+  let filePath = path.join(process.cwd(), "data", "dummy-backend.json");
+  const jsonData = await fs.promises.readFile(filePath);
+  const data = JSON.parse(jsonData);
+
+  if (!data)
+    return {
+      redirect: {
+        destination: "/no-data",
+      },
+    };
+
+  if (data.products.length === 0)
+    return {
+      notFound: true,
+    };
+
+  return {
+    props: {
+      products: data.products,
+    },
+    revalidate: 600, // rerender or regenerate
+  };
+}
+
+export default HomePage;
